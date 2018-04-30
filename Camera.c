@@ -12,6 +12,7 @@
 
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
    */
+#include "stdafx.h"   // for Windows
 #include "features.h"
 #include <math.h>   /* for sqrt */
 #include <stdio.h>  /* for FILE, fopen, fputc */
@@ -204,7 +205,7 @@ void Results(char *name, int version, int upper)
 
 	Number = 0;
 
-	fp = fopen( name, "w");
+	fopen_s(&fp, name, "w");
 	if (upper)
     {
         fprintf( fp, "%i", g_significantU );
@@ -268,7 +269,7 @@ int frame(int Live, int i)
 //		do_video1();
 		ImageHeight = CorrectImage();
 		ImageWidth -= ALIGNMENT;
-		sprintf( name, "Can%i.bmp", i);
+		sprintf_s( name, 24, "Can%i.bmp", i);
 		/* write the image from the camera */
 //		do_savebmp(name);
 		printf("Hit any key for next image.");
@@ -293,12 +294,12 @@ int frame(int Live, int i)
 #include <time.h>   /* for clock */
 //#include "Version.h"  /* requires stdio.h */
 
-extern void initialize();
-extern void image_match();
-extern int  ReadPGM(char *image_name);
+// extern void initialize();
+// extern void image_match();   // Image_match.c has a lot of code for stereo correspondence.
+extern int  ReadPGM(char *image_name);  // In io.c; reads an image in .pgm format.
 extern void GetGrid();
 extern int  frame(int Live, int i);
-extern int  CorrectImage();
+extern int  CorrectImage();  // In io.c: matches a steereo pair in the upper and lower halves of the image.
 
 #if (DEBUG >= 3)
 extern void ShowKernel();
@@ -310,8 +311,8 @@ extern int ImageWidth;
 extern int ImageHeight;
 
 /*---------------------------------------------------------------------------*/
-// rename this to main() if not using module top.c
-int main2(int argc, char *argv[])
+// rename this to main() if not using module top.c; otherwise call it main2()
+int main(int argc, char *argv[])
 {
 	// argv: prog_name  image_name.pgm
 	char *image_name;
@@ -322,7 +323,7 @@ int main2(int argc, char *argv[])
 	float elapsed;
 
 	image_name = argc < 2? "image.pgm" : argv[1];
-	initialize();
+	// initialize();
 	ImageWidth = BOUNDS_RIGHT - ALIGNMENT;
 	ImageHeight = BOUNDS_BOTTOM - 2 * DISPARITY_AT_INFINITY;
 	if (!Live)
@@ -347,7 +348,7 @@ int main2(int argc, char *argv[])
 
 //	frameTime = clock();
 	frame(Live, ++frame_number);    // Image Features
-	image_match();			// Image Match
+//	image_match();			// Combine edge segments into polylines and find stereo correspondences.
 #if (DEBUG >= 3)
     ShowKernel();
 #endif

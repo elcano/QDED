@@ -11,7 +11,7 @@
 
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
    */
-
+#include "stdafx.h"
 #include "features.h"
 #include <math.h>   /* for sqrt */
 #include <stdlib.h> /* for malloc */
@@ -30,7 +30,7 @@ extern float StartResults(FILE *fp, int version);
 extern void WriteALL( int Width, int Height, PIXEL *image, char *filename);
 extern void DrawLine( int i, PIXEL *image, int rowLength);
 extern void DrawKernels(struct FILTER *pKern, char *Name);
-
+extern float GetAngle(float *dom_resp, float *steeredEven, float *steeredOdd);
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ extern PIXEL Image[3 * BOUNDS_RIGHT * BOUNDS_BOTTOM];
 extern int ImageWidth;
 extern int ImageHeight;
 
-
+float corrEven[3], corrOdd[2];
 /*------------------------------------------------------------------------*/
 /* global to this file */
 static struct FILTER even[MAX_FILTERS];
@@ -137,7 +137,7 @@ float correlate(
 			magSqr += result * result;
 		}
 	}
-	else
+	else  /* subsample  */
 	{
 		/* assume that Image is stored by scan lines with no padding */
 		last_row = pLocation + BOUNDS_RIGHT * pFilter->sampleSpacing * size;
@@ -227,8 +227,8 @@ void setKernel(int scale, struct FILTER *pKern)
 		pKern->offset = 0.5;  /* size is an even number. */
     /* If kernel and image patch are not the same size, 
 	   how many points of image were ignored? */
-	pKern->offset -= 0.5 * (pKern->diam - 
-		(pKern->sampleSpacing * (pKern->filterSize - 1) + 1));
+	pKern->offset -= (pKern->diam - 
+		(pKern->sampleSpacing * (pKern->filterSize - 1) + 1))/2;
 
     for (orn = 0; orn < pKern->orientations; orn++)
     {
@@ -329,7 +329,7 @@ int FindFeatures()
 	int i, filterIndex;
 	int radius;
 	PIXEL *pPixel;
-	float evenSqr, oddSqr;
+	float evenSqr, oddSqr, totalSqr;
 	int Number = 0;		/* Number, space and border are only used in DEBUG */
 	float space = 0;
 	int border = 0;
@@ -339,8 +339,8 @@ int FindFeatures()
 #endif
 #if (DEBUG >= 2)
 	FILE *fp;
-	fp = fopen("FullInfo.txt", "w");
-	space = StartResults(fp, 2);
+	fopen_s(&fp, "FullInfo.txt", "w");
+	space = StartResults(fp, 2);  // Write the header
 #else
     space =  (float)(ROOT_3 / 4) *  (FILTER_DIAM / OVERLAP); 
 #endif
@@ -367,7 +367,14 @@ int FindFeatures()
 		}
 		else
 		{
-            find_pos(i, &odd[filterIndex]);
+			corrEven[0] = Location[i].corrEven[0];
+			corrEven[1] = Location[i].corrEven[1];
+			corrEven[2] = Location[i].corrEven[2];
+			corrOdd[0] = Location[i].corrOdd[0];
+			corrOdd[1] = Location[i].corrOdd[1];
+			Location[i].StrengthRaw = GetAngle(&totalSqr,&evenSqr,&oddSqr);
+            find_pos(i, &odd[filterIndex]);  /* is this correct?  TCF 4/17/18 */
+			Location[i].Type = eEDGE;
 #ifdef DEBUG
 #ifdef VERT_STEREO
 	    while (Location[i].c > border  && Number < ImageWidth)

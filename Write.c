@@ -4,7 +4,7 @@
 
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
 */
-
+#include "stdafx.h"   // for Windows
 #include "features.h"
 #include "basetypes.h"
 #include <math.h>   /* for sqrt */
@@ -79,8 +79,8 @@ void WriteKernel( int diam,  float *image, char *filename)
 	maximum = -minimum > maximum ? -minimum : maximum;
 	scale =  maximum < EPSILON? 1 : 127 / maximum;
 	kernel = image;
-	fp = fopen(filename, "w");
-	fprintf(fp, "P5 %i %i 255 ", diam, diam);
+	fopen_s(&fp, filename, "w");
+	fprintf_s(fp, "P5 %i %i 255 ", diam, diam);
  	for(i=0; i < diam; i++)
 	{
 		for (j=0; j<diam; j++)
@@ -100,7 +100,7 @@ void DrawKernels(struct FILTER *pKern, char *Name)
 	kernel = pKern->pKern;
 	for (orn = 0; orn < pKern->orientations; orn++)
 	{
-		sprintf( name, "%4s%i_%i.PGM", Name, pKern->diam, orn);
+		sprintf_s( name, 13, "%4s%i_%i.PGM", Name, pKern->diam, orn);
 		WriteKernel (pKern->filterSize, kernel, name);
 		kernel += (pKern->filterSize) * (pKern->filterSize);
 	}
@@ -485,7 +485,7 @@ void DrawLine( int i, PIXEL *image, int rowLength)
 	g_buffer = image;
 	g_rowlength = rowLength;
 	/* Find the points at which line cuts the square. */
-	angle = Location[i].degrees;
+	angle = (float) Location[i].degrees;
 	if (rowLength < BOUNDS_RIGHT)
 	{  // subimage
 		xa = Location[i].column - Location[i].c + Location[i].diam/2;
@@ -493,13 +493,13 @@ void DrawLine( int i, PIXEL *image, int rowLength)
 		g_max_row = g_max_col = Location[i].diam;
 		g_min_row = g_min_col = 0;
 		if (xa < g_min_col)
-			xa = g_min_col;
+			xa = (float) g_min_col;
 		if (xa >= g_max_col)
-			xa = g_max_col-1;
+			xa = (float) g_max_col-1;
 		if (ya < g_min_row)
-			ya = g_min_row;
+			ya = (float) g_min_row;
 		if (ya >= g_max_row)
-			ya = g_max_row-1;
+			ya = (float) g_max_row-1;
 	}
 	else
 	{  // full image
@@ -541,9 +541,9 @@ void TestLine()
 			for (j = 0; j < FILTER_DIAM; j++)
 				test[i+FILTER_DIAM*j] = 128;
 		DrawLine( 0, test, FILTER_DIAM);
-		sprintf(filename, "Debug\\Test%.0i.PGM", Location[0].degrees);
-		fp = fopen(filename, "w");
-		fprintf(fp, "P5 %i %i 255 ", FILTER_DIAM, FILTER_DIAM);
+		sprintf_s(filename, 25, "Debug\\Test%.0i.PGM", Location[0].degrees);
+		fopen_s(&fp, filename, "w");
+		fprintf_s(fp, "P5 %i %i 255 ", FILTER_DIAM, FILTER_DIAM);
  		for(i=0; i < FILTER_DIAM; i++)
 		{
 			fwrite(pImage, sizeof(PIXEL), FILTER_DIAM, fp);
@@ -585,8 +585,8 @@ void WritePGM( int Width, int Height, PIXEL *image, char *filename,
 	}
 
 	DrawLine( featureIndex, ImageCopy, FILTER_DIAM);
-	fp = fopen(filename, "wb");
-	fprintf(fp, "P5 %i %i 255 ", Width, Height);
+	fopen_s(&fp, filename, "wb");
+	fprintf_s(fp, "P5 %i %i 255 ", Width, Height);
  	for(i=0; i < Height; i++)
 	{
 		for (j=0; j < Width; j++)
@@ -604,8 +604,8 @@ void WriteALL( int Width, int Height, PIXEL *image, char *filename)
 	FILE *fp;
 	int i;
 
-	fp = fopen(filename, "wb");
-	fprintf(fp, "P5 %i %i 255 ", Width, Height);
+	fopen_s(&fp, filename, "wb");
+	fprintf_s(fp, "P5 %i %i 255 ", Width, Height);
  	for(i=0; i < Height; i++)
 	{
 		fwrite(image, sizeof(PIXEL), Width, fp);
@@ -620,8 +620,8 @@ void WritePPM( int Width, int Height, PIXEL *image, char *filename)
 	FILE *fp;
 	int i;
 
-	fp = fopen(filename, "wb");
-	fprintf(fp, "P6 %i %i 255 ", Width, Height);
+	fopen_s(&fp, filename, "wb");
+	fprintf_s(fp, "P6 %i %i 255 ", Width, Height);
  	for(i=0; i < Height; i++)
 	{
 		fwrite(image, sizeof(PIXEL), Width, fp);

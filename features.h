@@ -66,10 +66,9 @@ struct FEATURE
     int Back;           /* index to reverse neighbor */
     int Match;          /* index to stereo disparity match */
     int Number;      /* polyline number that this point belongs to */
-    float Score;
-    float corrEven[3];
-    float corrOdd[2];
-
+    float Score;   
+    float corrEven[3];  /* numbers resulting from correlating with 0, 60 and 120 degree filters */
+    float corrOdd[2];   /* numbers from correlating with odd filters at 0 an 90 degrees */
 };
 struct FILTER
 {

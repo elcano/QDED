@@ -4,7 +4,7 @@
 
   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
 */
-
+#include "stdafx.h"   // for Windows
 #include "features.h"
 #include <stdio.h>  /* for FILE, fopen, fputc */
 #include <ctype.h>  /* for isspace */
@@ -66,7 +66,7 @@ int ReadPGM(char *image_name)
 	char magicNum[4];
 	int width, height, bits;
 	/* read a PCX file; default is image.pgm */
-	fp = fopen(image_name, "rb");
+	fopen_s(&fp, image_name, "rb");
 	// assert (fp != NULL);
 	magicNum[0] = (char) getc(fp);
 	magicNum[1] = (char) getc(fp);
@@ -93,7 +93,7 @@ int ReadPGM(char *image_name)
     {
         ungetc(c,fp); /* push char back so we can scan the line */
     }
-	fscanf(fp, "%i%i%i", &width, &height, &bits);
+	fscanf_s(fp, "%i%i%i", &width, &height, &bits);
 	// assert 3 numbers, right size, bits == 8
 	/* clear out image */
 	for (i = 0; i < BOUNDS_RIGHT * BOUNDS_BOTTOM; i++)
@@ -105,7 +105,7 @@ int ReadPGM(char *image_name)
 			k = i * BOUNDS_RIGHT;
 			for(j=0; j<width; j++)
 			{
-				fscanf(fp, "%i", &Image[k++]);
+				fscanf_s(fp, "%i", &Image[k++]);
 			}
 		}
 	}

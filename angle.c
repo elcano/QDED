@@ -1,9 +1,10 @@
 /* angle.c:  find the angle of maximum response and steer to it 
-  Routines here are unused, except steer_60 and steer_90.
 
   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
 
 */
+
+#include "stdafx.h"  // for Windows
 #include "features.h"
 #include "basetypes.h"
 #include <math.h>  /* for sin, cos */
@@ -13,6 +14,8 @@
 #define G2_ORN 3
 #define WAY_SMALL  ((float) -1.0e20)
 
+float steer_60(float *sampled, float theta);
+float steer_90(float *sampled, float theta);
 
 extern float corrEven[3], corrOdd[2];
 
@@ -24,7 +27,7 @@ extern float corrEven[3], corrOdd[2];
     input:  sampled - response of filters at 0, 60, 120 degrees.
             theta   - angle for desired response in radians.
     returned value: the interpolated filter response at theta.
-
+*/
 float steer_60( 
     float *sampled,
     float theta)
@@ -42,7 +45,7 @@ float steer_60(
     steered /= G2_ORN;
     return (steered);
 }
-*/
+
 /*------------------------------------------------------------------------*/
 /* 
     steer_90: Given input filters sampled at 90 degrees, interpolate
@@ -51,7 +54,7 @@ float steer_60(
     input:  sampled - response of filters at 0, 90 degrees.
             theta   - angle for desired response in radians.
     returned value: the interpolated filter response at theta.
-
+	*/
 float steer_90( 
     float *sampled,
     float theta)
@@ -59,7 +62,6 @@ float steer_90(
     return ( (float) (sampled[0] * cos( theta)
                     + sampled[1] * sin( theta)) );
 }
-*/
 /*------------------------------------------------------------------------*/
 /* 
     solve_max: Given sampled input filters, and an initial estimate of the angle 
@@ -294,7 +296,7 @@ float g1h1(
     float dtheta;
     float funct;
 
-    dtheta = 2.0 * theta;
+    dtheta = 2 * theta;
     sin_2th = (float) sin( dtheta);
     cos_2th = (float) cos( dtheta);
     sin_4th = FL2 * sin_2th * cos_2th;
