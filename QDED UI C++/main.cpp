@@ -12,9 +12,9 @@
 using namespace std;
 using namespace std::chrono;
 using namespace cv;
-//Cone height ~ 18 feet
-//Cone width ~ 11 feet
-//Cone mid width ~ 4 feet
+//Cone height ~ 18 inch
+//Cone width ~ 11 inch
+//Cone mid width ~ 4 inch
 
 //If values have been read in by QDED this method marks the edges.
 int findConeEdges(Mat image, std::vector<int> col, std::vector<int> row, std::vector<int> angle)
