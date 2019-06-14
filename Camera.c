@@ -263,7 +263,7 @@ int frame(int Live, int i)
 {
 	char name[25];
 
-	if (Live)
+	while (Live)
 	{
 		/* capture an image from the camera */
 //		do_video1();
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
 	float elapsed;
 
 	image_name = argc < 2? "image.pgm" : argv[1];
-	// initialize();
+	//initialize();
 	ImageWidth = BOUNDS_RIGHT - ALIGNMENT;
 	ImageHeight = BOUNDS_BOTTOM - 2 * DISPARITY_AT_INFINITY;
 	if (!Live)
@@ -339,12 +339,12 @@ int main(int argc, char *argv[])
 
 	time = startTime = clock();
 	/* initial delay */
-	printf("waiting\n");
+	//printf("waiting\n");
 	while ((time - startTime) < DELAY * CLOCKS_PER_SEC)
 	{
 		time = clock();
 	}
-	printf("moving\n");
+	//printf("moving\n");
 
 //	frameTime = clock();
 	frame(Live, ++frame_number);    // Image Features

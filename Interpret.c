@@ -268,17 +268,20 @@ void find_pos( int i, struct FILTER *pKern )
 		Location[i].corrOdd[0] * Location[i].corrOdd[0]);
 	if (FL_ABS(phase) < 0.43  || FL_ABS(phase) > 2.7 || magn < MIN_RESPONSE)
 	{
+		//This is where all of the no features are
 		Location[i].Type = eNO_FEATURE;
+		//Location[i].StrengthRaw = find_strength( magn, phase);
 		return;
 	}
     i < g_2nd_half? g_significantU++: g_significantL++;
 
-	Location[i].degrees = 90;
+	//
+	//Location[i].degrees = 90;
 	Location[i].StrengthRaw = find_strength( magn, phase);
 	if (Location[i].corrOdd[0] < 0)
     {
 		Location[i].StrengthRaw = -Location[i].StrengthRaw;
-    	Location[i].degrees = 270;
+    	//Location[i].degrees = 270;
     }
 	Pos = (Location[i].diam+1)/(2*EFF_LIM) * find_step(phase) / pKern->sampleSpacing;
 #ifdef VERT_STEREO

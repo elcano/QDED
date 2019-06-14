@@ -372,7 +372,8 @@ int FindFeatures()
 			corrEven[2] = Location[i].corrEven[2];
 			corrOdd[0] = Location[i].corrOdd[0];
 			corrOdd[1] = Location[i].corrOdd[1];
-			Location[i].StrengthRaw = GetAngle(&totalSqr,&evenSqr,&oddSqr);
+			//Location[i].StrengthRaw = GetAngle(&totalSqr,&evenSqr,&oddSqr);
+			Location[i].degrees = GetAngle(&totalSqr,&evenSqr,&oddSqr) *90/PI_HALF;
             find_pos(i, &odd[filterIndex]);  /* is this correct?  TCF 4/17/18 */
 			Location[i].Type = eEDGE;
 #ifdef DEBUG
