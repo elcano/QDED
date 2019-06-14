@@ -1,0 +1,1 @@
+This exe will convert "image".jpg to "image".pgm for use with QDED
