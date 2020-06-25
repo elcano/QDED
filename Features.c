@@ -1,4 +1,11 @@
 /* Features.c
+   June 25, 2020  Tyler Folsom
+   The 2005 version had been used to find stereo disparity,
+   with both stereo views appearing in a single image.
+   Present code removes stereo and an unnecessary addition of OpenCV.
+   Code is intended for an embedded processor (such as Raspberry PI)
+   Current version of code compiles on Microsoft visual Studio.
+
    March 27, 2005   Tyler Folsom
    This is the processing file for ImageFeatures version 4.0
    This is a repackaging of Image Features version 3.x
@@ -9,7 +16,7 @@
    Further processing is done in Image Match, which typically runs on a
    separate processor.
 
-   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
+   Copyright (c) 2005, 2020  Tyler Folsom.  All rights reserved.
    */
 //#include "stdafx.h"
 #include "features.h"

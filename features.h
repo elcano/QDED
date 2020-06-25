@@ -178,7 +178,6 @@ enum feature_type
    the coverage.  3.0 is the highest overlap. */
 #define OVERLAP        ((float) 1.3)
 
-/* delay in seconds before starting robot in motion */
-#define DELAY         0.0
+
 
 #endif // FEATURES_H

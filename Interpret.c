@@ -2,7 +2,7 @@
 	Once a feature has been reduced to a one-dimensional even and odd filter,
 	this interprets the values to determine where an edge is.
 
-   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
+   Copyright (c) 2005, 2020  Tyler Folsom.  All rights reserved.
 
 */
 //#include "stdafx.h"   // for Windows

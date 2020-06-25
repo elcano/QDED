@@ -1,4 +1,11 @@
 /* Camera.c
+   June 25, 2020  Tyler Folsom
+   The 2005 version had been used to find stereo disparity,
+   with both stereo views appearing in a single image.
+   Present code removes stereo and an unnecessary addition of OpenCV.
+   Code is intended for an embedded processor (such as Raspberry PI)
+   Current version of code compiles on Microsoft visual Studio.
+
    March 27, 2005   Tyler Folsom
    This is the main file for ImageFeatures version 4.0
    This is a repackaging of Image Features version 3.x
@@ -10,7 +17,7 @@
    Further processing is done in Image Match, which typically runs on a
    separate processor.
 
-   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
+   Copyright (c) 2005, 2020  Tyler Folsom.  All rights reserved.
    */
 //#include "stdafx.h"   // for Windows
 #include "features.h"
@@ -22,8 +29,7 @@ extern int  FindFeatures();
 extern void Readable( int i, FILE *fp, int Number, float evenResp, float oddResp );
 //extern void do_savebmp(char *name);
 //extern void do_video1(void);
-//extern int  CorrectImage();
-
+int qded(char* image_name);
 
 /*---------------------------------------------------------------------------*/
 /* global variables */
@@ -310,18 +316,12 @@ extern int ImageWidth;
 extern int ImageHeight;
 
 /*---------------------------------------------------------------------------*/
-// rename this to main() if not using module top.c; otherwise call it main2()
-int main(int argc, char *argv[])
+// rename this to main() if not using module top.c; otherwise call it qded()
+int qded(char* image_name)
 {
-	// argv: prog_name  image_name.pgm
-	char *image_name;
-	clock_t time;  /* time in CLOCKS_PER_SEC to do processing */
-	clock_t startTime;
 	int Live = FALSE;
 	int frame_number = 0;
-	float elapsed;
 
-	image_name = argc < 2? "Images\\Carla5.pgm" : argv[1];
 	//initialize();
 	ImageWidth = BOUNDS_RIGHT;
 	ImageHeight = BOUNDS_BOTTOM;
@@ -334,24 +334,11 @@ int main(int argc, char *argv[])
 	/* get the initial sampling grid */
 	GetGrid();
 
-	time = startTime = clock();
-	/* initial delay */
-	//printf("waiting\n");
-	while ((time - startTime) < DELAY * CLOCKS_PER_SEC)
-	{
-		time = clock();
-	}
-	//printf("moving\n");
-
-//	frameTime = clock();
 	frame(Live, ++frame_number);    // Image Features
 //	image_match();			// Combine edge segments into polylines and find stereo correspondences.
 #if (DEBUG >= 3)
     ShowKernel();
 #endif
-	time = clock();
-	elapsed = (float) (time - startTime) / CLOCKS_PER_SEC;
-	printf("Elapsed time: %.3f seconds/n", elapsed);
 	return 0;  /* simulation */
 }
 

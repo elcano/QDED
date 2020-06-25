@@ -1,6 +1,6 @@
 /* angle.c:  find the angle of maximum response and steer to it 
 
-  Copyright (c) 2005  Tyler Folsom.  All rights reserved.
+  Copyright (c) 2005, 2020  Tyler Folsom.  All rights reserved.
 
 */
 

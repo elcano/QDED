@@ -2,7 +2,7 @@
   April 26, 2005   Tyler Folsom
   Routines to communicate with camera and DSP
 
-  Copyright (c) 2005  Tyler Folsom.  All rights reserved.
+  Copyright (c) 2005, 2020  Tyler Folsom.  All rights reserved.
 */
 
 #include "features.h"

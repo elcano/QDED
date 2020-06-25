@@ -2,7 +2,7 @@
    This file contains stuff only used for debugging.
    Tyler Folsom  April 17, 2005
 
-   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
+   Copyright (c) 2005, 2020  Tyler Folsom.  All rights reserved.
 */
 #define BRIEF
 #include "features.h"
