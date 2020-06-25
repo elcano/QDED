@@ -11,7 +11,7 @@
 
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
    */
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "features.h"
 #include <math.h>   /* for sqrt */
 #include <stdlib.h> /* for malloc */

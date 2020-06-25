@@ -24,24 +24,17 @@
 	Do not undefine VERT_STEREO  TCF 8/23/05
 */
 #define VERT_STEREO 1
-/* size of image, pixels */
-#define BOUNDS_RIGHT  1280
+/* maximum size of image, pixels */
+#define BOUNDS_RIGHT  1600
 #define BOUNDS_BOTTOM 1022
 /* maximum number of locations */
 #define MAX_LOCS (BOUNDS_RIGHT*BOUNDS_BOTTOM/FILTER_DIAM)
-/* Portions of image to not use because of mirror misadjustment */
-#define ALIGNMENT 15
-#define DISPARITY_AT_INFINITY 100
-// How many pixels should be from upper image to lower image for distant objects
-#define DISPARITY_DISTANT 400
 
 #define POLYLINE_SIZE (MAX_LOCS/2)
 /* chunk size for reading and writing PGM images. */
 #define LINE_BUFFER 256
 
-//typedef unsigned short PIXEL;
 typedef unsigned char PIXEL;
-//typedef short int BOOL;
 
 struct FEATURE
 {
@@ -51,9 +44,6 @@ struct FEATURE
 	int degrees;   /* 90, 270, 0 or 180 */
 	float column;    /* subpixel location of feature */
 	float row;
-    float Disparity;
-    float Depth;     /* In meters; inversely proportional to Disparity */
-	/* the center of the feature in the dimension used for binocular stereo */
 	float StrengthRaw; /* also scaled by 255 */
 	int Type;
     int NbrUp;          /* indices to the six neighboring cells */
@@ -64,7 +54,6 @@ struct FEATURE
     int NbrUpRight;
     int Ahead;          /* index to forward neighbor */
     int Back;           /* index to reverse neighbor */
-    int Match;          /* index to stereo disparity match */
     int Number;      /* polyline number that this point belongs to */
     float Score;   
     float corrEven[3];  /* numbers resulting from correlating with 0, 60 and 120 degree filters */
@@ -100,7 +89,7 @@ enum feature_type
 #define LINUX 2
 /* Small robot from Seattle Robotics Society */
 #define SRS 3
-#define PLATFORM LINUX
+#define PLATFORM PC
 #define FL_ABS(x) ((x)>0?(x):-(x))
 
 #if (PLATFORM == DSP)

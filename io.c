@@ -4,7 +4,7 @@
 
   Copyright (c) 2005  Tyler Folsom.  All rights reserved.
 */
-#include "stdafx.h"   // for Windows
+
 #include "features.h"
 #include <stdio.h>  /* for FILE, fopen, fputc */
 #include <ctype.h>  /* for isspace */
@@ -13,47 +13,12 @@
 PIXEL Image[3 * BOUNDS_RIGHT * BOUNDS_BOTTOM];
 int ImageWidth;
 int ImageHeight;
-
+int ReadPGM(char *image_name);
+extern void WritePPM(int Width, int Height, PIXEL* image, char* filename);
 extern void WritePGM( int Width, int Height, PIXEL *image, char *filename, 
 			   int featureIndex, struct FILTER *pKern);
 
 /*---------------------------------------------------------------------------*/
-int CorrectImage()
-{
-	int i, j;
-	if (ImageWidth < BOUNDS_RIGHT - 2 * DISPARITY_AT_INFINITY || 
-		ImageHeight < BOUNDS_BOTTOM - ALIGNMENT)
-		return ImageHeight;
-	/* move up the top image */
-	for(i = DISPARITY_AT_INFINITY * BOUNDS_RIGHT; i < BOUNDS_BOTTOM/2 * BOUNDS_RIGHT; i++)
-	{
-		Image[i - DISPARITY_AT_INFINITY * BOUNDS_RIGHT] = Image[i];
-	}
-	/* flip the lower image and move it up. */
-	for(i = (BOUNDS_BOTTOM/2 - DISPARITY_AT_INFINITY) * BOUNDS_RIGHT;
-		i < (BOUNDS_BOTTOM/2 + DISPARITY_AT_INFINITY) * BOUNDS_RIGHT;
-		i += BOUNDS_RIGHT)
-	{
-		for (j = 0; j < BOUNDS_RIGHT - ALIGNMENT; j++)
-		{
-			Image[j + i] = 
-			 Image[j + ALIGNMENT + (BOUNDS_BOTTOM*3/2 - DISPARITY_AT_INFINITY) * BOUNDS_RIGHT - i];
-		}
-	}
-	for(i = (BOUNDS_BOTTOM/2  +  DISPARITY_AT_INFINITY) * BOUNDS_RIGHT;
-		i < (BOUNDS_BOTTOM*3/4 - DISPARITY_AT_INFINITY/2) * BOUNDS_RIGHT;
-		i += BOUNDS_RIGHT)
-	{
-		for (j = 0; j < BOUNDS_RIGHT - ALIGNMENT; j++)
-		{
-			Image[j + i] = 
-			 Image[j + ALIGNMENT + (BOUNDS_BOTTOM*3/2 - DISPARITY_AT_INFINITY) * BOUNDS_RIGHT - i];
-			Image[j + (BOUNDS_BOTTOM*3/2 - DISPARITY_AT_INFINITY) * BOUNDS_RIGHT - i]
-			 = Image[j + ALIGNMENT + i];
-		}
-	}
-	return(BOUNDS_BOTTOM - DISPARITY_AT_INFINITY * 2);
-}
 /*---------------------------------------------------------------------------*/
 int ReadPGM(char *image_name)
 {
@@ -65,9 +30,10 @@ int ReadPGM(char *image_name)
 	unsigned char image_line[LINE_BUFFER];
 	char magicNum[4];
 	int width, height, bits;
+	size_t charsRead;
 	/* read a PCX file; default is image.pgm */
 	fopen_s(&fp, image_name, "rb");
-	// assert (fp != NULL);
+    if (fp == NULL) return 1;
 	magicNum[0] = (char) getc(fp);
 	magicNum[1] = (char) getc(fp);
 	/* magic numbers
@@ -105,7 +71,7 @@ int ReadPGM(char *image_name)
 			k = i * BOUNDS_RIGHT;
 			for(j=0; j<width; j++)
 			{
-				fscanf_s(fp, "%i", &Image[k++]);
+				fscanf_s(fp, "%c", &Image[k++], 1);
 			}
 		}
 	}
@@ -118,7 +84,11 @@ int ReadPGM(char *image_name)
  			for(i=0; i < height; i++)
 			{
 				k = i * BOUNDS_RIGHT;
-				fread(&image_line, sizeof(unsigned char), width, fp);
+				charsRead = fread(&image_line, sizeof(unsigned char), width, fp);
+				if (charsRead < width)
+				{
+					printf("%d characters read; expected %d", charsRead, width);
+				}
 				for (j=0; j < width; j++)
 					Image[k+j] = image_line[j];
 			}
@@ -132,12 +102,20 @@ int ReadPGM(char *image_name)
 				k = i * BOUNDS_RIGHT;
 				for (j = 0; j < chunks; j++)
 				{
-					fread(&image_line, sizeof(unsigned char), LINE_BUFFER, fp);
+					charsRead = fread(&image_line, sizeof(unsigned char), LINE_BUFFER, fp);
+					if (charsRead < LINE_BUFFER)
+					{
+						printf("%d characters read; expected %d", charsRead, LINE_BUFFER);
+					}
 					for (jj = 0; jj < LINE_BUFFER; jj++)
 						Image[k+j*LINE_BUFFER+jj] = image_line[jj];
 				}
 				if (remainder > 0)
-					fread(&image_line, sizeof(unsigned char), remainder, fp);
+					charsRead = fread(&image_line, sizeof(unsigned char), remainder, fp);
+					if (charsRead < remainder)
+					{
+						printf("%d characters read; expected %d", charsRead, remainder);
+					}
 					for (jj = 0; jj < remainder; jj++)
 						Image[k+j*LINE_BUFFER+jj] = image_line[jj];
 			}
@@ -147,7 +125,8 @@ int ReadPGM(char *image_name)
 	ImageWidth = width;  // set globals
 	ImageHeight = height;
 	/* DEBUG */
-//	WritePGM( 30, 150, &Image[285], "UpDoor.PGM", UNUSED, null);
+	WriteALL(width, height, Image, "Images\\carl5.PGM");
+//	WritePGM( width, height, &Image[0], "Karla5.PGM", UNUSED, NULL);
 
 	return 0;   // success 
 }

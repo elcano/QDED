@@ -12,7 +12,7 @@
 
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
    */
-#include "stdafx.h"   // for Windows
+//#include "stdafx.h"   // for Windows
 #include "features.h"
 #include <math.h>   /* for sqrt */
 #include <stdio.h>  /* for FILE, fopen, fputc */
@@ -22,7 +22,7 @@ extern int  FindFeatures();
 extern void Readable( int i, FILE *fp, int Number, float evenResp, float oddResp );
 //extern void do_savebmp(char *name);
 //extern void do_video1(void);
-extern int  CorrectImage();
+//extern int  CorrectImage();
 
 
 /*---------------------------------------------------------------------------*/
@@ -123,8 +123,6 @@ void GetGrid()
                     Location[g_locations].NbrUpRight = UNUSED;
                     Location[g_locations].Ahead = UNUSED;
                     Location[g_locations].Back = UNUSED;
-                    Location[g_locations].Disparity = UNUSED;
-                    Location[g_locations].Match = UNUSED;
 				    if (g_locations++ >= MAX_LOCS)
 					    return;
 			    }	// loop on rows
@@ -259,8 +257,10 @@ void Results(char *name, int version, int upper)
 	fclose (fp);
 }
 /*---------------------------------------------------------------------------*/
+
 int frame(int Live, int i)
 {
+#ifdef LIVE_VIDEO
 	char name[25];
 
 	while (Live)
@@ -268,7 +268,6 @@ int frame(int Live, int i)
 		/* capture an image from the camera */
 //		do_video1();
 		ImageHeight = CorrectImage();
-		ImageWidth -= ALIGNMENT;
 		sprintf_s( name, 24, "Can%i.bmp", i);
 		/* write the image from the camera */
 //		do_savebmp(name);
@@ -282,10 +281,10 @@ int frame(int Live, int i)
 #ifdef DEBUG
 	Results("Ureadable.txt", 2, TRUE);
 	Results("Lreadable.txt", 2, FALSE);
-#endif
+#endif  // DEBUG
 	/* Look for an updated grid based on last processing */
 //	GetNewGrid( time, desired_time);
-
+#endif // LIVE_VIDEO
 	return 0;
 }
 /*---------------------------------------------------------------------------*/
@@ -322,16 +321,14 @@ int main(int argc, char *argv[])
 	int frame_number = 0;
 	float elapsed;
 
-	image_name = argc < 2? "image.pgm" : argv[1];
+	image_name = argc < 2? "Images\\Carla5.pgm" : argv[1];
 	//initialize();
-	ImageWidth = BOUNDS_RIGHT - ALIGNMENT;
-	ImageHeight = BOUNDS_BOTTOM - 2 * DISPARITY_AT_INFINITY;
+	ImageWidth = BOUNDS_RIGHT;
+	ImageHeight = BOUNDS_BOTTOM;
 	if (!Live)
 	{
 		if (0 != ReadPGM(image_name))
 			return 1;  // Simulation mode, but no input file.
-		ImageHeight = CorrectImage();  // old images need correction; new do not
-		ImageWidth -= ALIGNMENT;
 	}
 
 	/* get the initial sampling grid */

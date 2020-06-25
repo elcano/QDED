@@ -4,7 +4,7 @@
 
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
 */
-#include "stdafx.h"   // for Windows
+#define BRIEF
 #include "features.h"
 #include "basetypes.h"
 #include <math.h>   /* for sqrt */
@@ -12,6 +12,7 @@
 #include <stdio.h>  /* for fprintf  */
 
 #define ABS(x)  ((x)>=0?(x):-(x))
+
 // NO_OP is a place holder for the IN/DE-CREMENT_X/Y functions.
 void NO_OP(void) {;};
 
@@ -614,7 +615,7 @@ void WriteALL( int Width, int Height, PIXEL *image, char *filename)
 	fclose(fp);
 }
 /*---------------------------------------------------------------------------*/
-/* Write a PPM image for polyline debugging */
+/* Write a PPM colorimage for polyline debugging */
 void WritePPM( int Width, int Height, PIXEL *image, char *filename)
 {
 	FILE *fp;
@@ -625,11 +626,8 @@ void WritePPM( int Width, int Height, PIXEL *image, char *filename)
  	for(i=0; i < Height; i++)
 	{
 		fwrite(image, sizeof(PIXEL), Width, fp);
-		image += BOUNDS_RIGHT;
 		fwrite(image, sizeof(PIXEL), Width, fp);
-		image += BOUNDS_RIGHT;
 		fwrite(image, sizeof(PIXEL), Width, fp);
-		image += BOUNDS_RIGHT;
 	}
 	fclose(fp);
 }
@@ -640,6 +638,7 @@ void WritePPM( int Width, int Height, PIXEL *image, char *filename)
 #define PURPLE_SIZE 5
 #define COLORS_SIZE 18
 #define PURPLE_DELTA ((float) 0.4921875)
+#define PURPLE  g_purples[1]
 struct RGB_COLOR
 { 
 	PIXEL red;
@@ -762,10 +761,7 @@ static int PlotPoly( struct Polyline *pL)
 		return OK;
 	if ( pL->Vertices == 1)
 	{
-		if (Location[v].Disparity == UNUSED)
-			SelectColor( UNUSED );
-		else
-			SelectColor( Location[v].Depth );
+		SelectColor(UNUSED); // Location[v].Depth );
 
 		g_min_row = Location[v].r - Location[v].diam/2;
 		g_max_row = g_min_row + Location[v].diam;
@@ -777,17 +773,10 @@ static int PlotPoly( struct Polyline *pL)
 	v_old = v;
     v = Location[v].Ahead;
     for (i = 1; i < pL->Vertices; i++)
-    {   /* Column, Row, Disparity */
+    {   /* Column, Row */
 		if (v == UNUSED)
 			return UNUSED;
-        if (Location[v].Disparity == UNUSED  && Location[v_old].Disparity == UNUSED)
-			SelectColor( UNUSED);
-		else if (Location[v_old].Disparity == UNUSED)
-			SelectColor( Location[v].Depth );
-		else if (Location[v].Disparity == UNUSED)
-			SelectColor( Location[v_old].Depth );
-		else
-			SelectColor((Location[v_old].Depth + Location[v].Depth)/2);
+		SelectColor(UNUSED);
 
 		LINE_BRESENHAM_COLOR(Location[v_old].column, Location[v_old].row,
 			Location[v].column, Location[v].row);
@@ -800,14 +789,7 @@ static int PlotPoly( struct Polyline *pL)
 	{
 	    v = pL->first;
 		v_old = pL->last;
-        if (Location[v].Disparity == UNUSED  && Location[v_old].Disparity == UNUSED)
-			SelectColor( UNUSED);
-		else if (Location[v_old].Disparity == UNUSED)
-			SelectColor( Location[v].Depth );
-		else if (Location[v].Disparity == UNUSED)
-			SelectColor( Location[v_old].Depth );
-		else
-			SelectColor((Location[v_old].Depth + Location[v].Depth)/2);
+		SelectColor(UNUSED);
 
 		LINE_BRESENHAM_COLOR(Location[v_old].column, Location[v_old].row,
 			Location[v].column, Location[v].row);

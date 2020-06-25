@@ -1,1 +1,2 @@
-Needs OpenCV. Runs UI for QDED and Cone Detection.
+OpenCV version for Cone Detection.
+QDED does not need OpenCV.

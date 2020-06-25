@@ -4,7 +4,7 @@
 
 */
 
-#include "stdafx.h"  // for Windows
+//#include "stdafx.h"  // for Windows
 #include "features.h"
 #include "basetypes.h"
 #include <math.h>  /* for sin, cos */

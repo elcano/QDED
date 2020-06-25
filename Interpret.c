@@ -5,7 +5,7 @@
    Copyright (c) 2005  Tyler Folsom.  All rights reserved.
 
 */
-#include "stdafx.h"   // for Windows
+//#include "stdafx.h"   // for Windows
 #include "features.h"
 #include <math.h>   /* for sqrt */
 
