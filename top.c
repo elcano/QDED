@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
 	//printf("moving\n");
 
 	char* image_name;	
-	image_name = argc < 2 ? "Images\\Carla5.pgm" : argv[1];
+	image_name = argc < 2 ? "Images\\Carla5.ppm" : argv[1];
 
 	// Find Orange Cones
 	ConeDetect(image_name);

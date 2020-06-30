@@ -599,35 +599,23 @@ void WritePGM( int Width, int Height, PIXEL *image, char *filename,
 	fclose(fp);
 }
 /*---------------------------------------------------------------------------*/
-/* Write a PGM image of the whole input plus found lines */
-void WriteALL( int Width, int Height, PIXEL *image, char *filename)
+/* Write a PGM or PPM image of the whole input plus found lines */
+void WriteALL( int Width, int Height, PIXEL *image, char *filename, int Magic)
 {
 	FILE *fp;
 	int i;
-
+	int width_pixels;
+	int pixel_bytes;
+	if (Magic < 1 || Magic >6)
+		Magic = 5;
+	pixel_bytes = (Magic == '5') ? 1 : 3;
+	width_pixels = (Magic == 3 || Magic == 6) ? 3* Width : Width;
 	fopen_s(&fp, filename, "wb");
-	fprintf_s(fp, "P5 %i %i 255 ", Width, Height);
+	fprintf_s(fp, "P%i %i %i 255 ", Magic, Width, Height);
  	for(i=0; i < Height; i++)
 	{
-		fwrite(image, sizeof(PIXEL), Width, fp);
-		image += BOUNDS_RIGHT;
-	}
-	fclose(fp);
-}
-/*---------------------------------------------------------------------------*/
-/* Write a PPM colorimage for polyline debugging */
-void WritePPM( int Width, int Height, PIXEL *image, char *filename)
-{
-	FILE *fp;
-	int i;
-
-	fopen_s(&fp, filename, "wb");
-	fprintf_s(fp, "P6 %i %i 255 ", Width, Height);
- 	for(i=0; i < Height; i++)
-	{
-		fwrite(image, sizeof(PIXEL), Width, fp);
-		fwrite(image, sizeof(PIXEL), Width, fp);
-		fwrite(image, sizeof(PIXEL), Width, fp);
+		fwrite(image, sizeof(PIXEL), width_pixels, fp);
+		image += pixel_bytes*BOUNDS_RIGHT;
 	}
 	fclose(fp);
 }
@@ -811,5 +799,5 @@ void GraphPolylines(char *name, struct Polyline *pUPoly, int Unum,
 	{
 		PlotPoly(pLPoly++);
 	}
-	WritePPM( ImageWidth, ImageHeight, g_buffer, name);
+	WriteALL( ImageWidth, ImageHeight, g_buffer, name, 6);
 }

@@ -34,7 +34,7 @@ extern void WriteKernel( int diam,  float *image, char *filename);
 extern void WritePGM( int Width, int Height, PIXEL *image, char *filename, 
 					  int i, struct FILTER *pKern);
 extern float StartResults(FILE *fp, int version);
-extern void WriteALL( int Width, int Height, PIXEL *image, char *filename);
+extern void WriteALL( int Width, int Height, PIXEL *image, char *filename, int Magic);
 extern void DrawLine( int i, PIXEL *image, int rowLength);
 extern void DrawKernels(struct FILTER *pKern, char *Name);
 extern float GetAngle(float *dom_resp, float *steeredEven, float *steeredOdd);
@@ -420,7 +420,8 @@ int FindFeatures()
 	{
 		DrawLine( i, Image, BOUNDS_RIGHT);
 	}
-	WriteALL( ImageWidth, ImageHeight, Image, "Lines.PGM");
+	WriteALL( ImageWidth, ImageHeight, Image, "Lines.PGM", 5); // gray image
+//	WriteALL( ImageWidth, ImageHeight, Image, "Lines.PGM", 6); // color image
 #endif
 	return TRUE;
 

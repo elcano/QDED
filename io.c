@@ -14,9 +14,7 @@ PIXEL Image[3 * BOUNDS_RIGHT * BOUNDS_BOTTOM];
 int ImageWidth;
 int ImageHeight;
 int ReadPGM(char *image_name);
-extern void WritePPM(int Width, int Height, PIXEL* image, char* filename);
-extern void WritePGM( int Width, int Height, PIXEL *image, char *filename, 
-			   int featureIndex, struct FILTER *pKern);
+extern void WriteALL(int Width, int Height, PIXEL* image, char* filename, int Magic);
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
@@ -25,11 +23,12 @@ int ReadPGM(char *image_name)
 //	struct FILTER *null = 0;
 	FILE *fp;
     char c;
-	int i, j, k, jj;
-	int chunks, remainder;
-	unsigned char image_line[LINE_BUFFER];
+	int i, j, k;
+	PIXEL* pImage;
 	char magicNum[4];
 	int width, height, bits;
+	int byte_size, pixel_bytes;
+	int width_pixels;
 	size_t charsRead;
 	/* read a PCX file; default is image.pgm */
 	fopen_s(&fp, image_name, "rb");
@@ -45,7 +44,7 @@ int ReadPGM(char *image_name)
 	Portable Gray Map (PGM) binary	P5	1 to 8	Gray scale
 	Portable Pixel Map (PPM) binary	P6	1 to 24	Color (RGB)
 	*/
-	if (magicNum[0] != 'P' || (magicNum[1] != '2' && magicNum[1] != '5') )
+	if (magicNum[0] != 'P' || (magicNum[1] != '2' && magicNum[1] != '5' && magicNum[1] != '6') )
 		return (1);  // unsupported format
 	do {
 		c = fgetc(fp);
@@ -60,9 +59,9 @@ int ReadPGM(char *image_name)
         ungetc(c,fp); /* push char back so we can scan the line */
     }
 	fscanf_s(fp, "%i%i%i", &width, &height, &bits);
-	// assert 3 numbers, right size, bits == 8
 	/* clear out image */
-	for (i = 0; i < BOUNDS_RIGHT * BOUNDS_BOTTOM; i++)
+	pImage = Image;
+	for (i = 0; i < 3* BOUNDS_RIGHT * BOUNDS_BOTTOM; i++)
 		Image[i] = 0;
 	if (magicNum[1] == '2')
 	{  // readASCII
@@ -75,58 +74,33 @@ int ReadPGM(char *image_name)
 			}
 		}
 	}
-	else
+	else // (magicNum[1] == '5' or '6')
 	{	// read binary
 	/* ignore the one byte of white space after 255 */
 		i = fgetc(fp);
-		if (width < LINE_BUFFER)
+		pixel_bytes = (magicNum[1] == '5') ? 1 : 3;
+		width_pixels = width * pixel_bytes;
+		byte_size =  sizeof(unsigned char);
 		{
  			for(i=0; i < height; i++)
 			{
-				k = i * BOUNDS_RIGHT;
-				charsRead = fread(&image_line, sizeof(unsigned char), width, fp);
-				if (charsRead < width)
+				charsRead = fread(pImage, byte_size, width_pixels, fp);
+				if (charsRead < width_pixels)
 				{
-					printf("%d characters read; expected %d", charsRead, width);
+					printf("%d characters read; expected %d", charsRead, width_pixels);
 				}
-				for (j=0; j < width; j++)
-					Image[k+j] = image_line[j];
-			}
-		}
-		else
-		{
-			chunks = width / LINE_BUFFER;
-			remainder = width - chunks * LINE_BUFFER;
- 			for(i=0; i < height; i++)
-			{
-				k = i * BOUNDS_RIGHT;
-				for (j = 0; j < chunks; j++)
-				{
-					charsRead = fread(&image_line, sizeof(unsigned char), LINE_BUFFER, fp);
-					if (charsRead < LINE_BUFFER)
-					{
-						printf("%d characters read; expected %d", charsRead, LINE_BUFFER);
-					}
-					for (jj = 0; jj < LINE_BUFFER; jj++)
-						Image[k+j*LINE_BUFFER+jj] = image_line[jj];
-				}
-				if (remainder > 0)
-					charsRead = fread(&image_line, sizeof(unsigned char), remainder, fp);
-					if (charsRead < remainder)
-					{
-						printf("%d characters read; expected %d", charsRead, remainder);
-					}
-					for (jj = 0; jj < remainder; jj++)
-						Image[k+j*LINE_BUFFER+jj] = image_line[jj];
+				pImage += pixel_bytes*BOUNDS_RIGHT;
 			}
 		}
 	}
+
 	fclose(fp);
 	ImageWidth = width;  // set globals
 	ImageHeight = height;
 	/* DEBUG */
-	WriteALL(width, height, Image, "Images\\carl5.PGM");
-//	WritePGM( width, height, &Image[0], "Karla5.PGM", UNUSED, NULL);
+//	WriteALL(width, height, Image, "Images\\carl5.PGM", 5);  // gray image
+	WriteALL(width, height, Image, "Images\\carl5.PPM", 6);  // color image
+	//	WritePGM( width, height, &Image[0], "Karla5.PGM", UNUSED, NULL);
 
 	return 0;   // success 
 }
