@@ -31,8 +31,8 @@ extern float find_step (float phase);
 extern float find_strength (float magn, float phase);
 #ifdef DEBUG
 extern void WriteKernel( int diam,  float *image, char *filename);
-extern void WritePGM( int Width, int Height, PIXEL *image, char *filename, 
-					  int i, struct FILTER *pKern);
+//extern void WritePGM( int Width, int Height, PIXEL *image, char *filename, 
+//					  int i, struct FILTER *pKern);
 extern float StartResults(FILE *fp, int version);
 extern void WriteALL( int Width, int Height, PIXEL *image, char *filename, int Magic);
 extern void DrawLine( int i, PIXEL *image, int rowLength);

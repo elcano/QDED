@@ -9,7 +9,8 @@
 #include <stdio.h>  /* for FILE, fopen, fputc */
 #include <ctype.h>  /* for isspace */
 
-
+#pragma comment(linker, "/STACK:16000000")
+#pragma comment(linker, "/HEAP:16000000")
 PIXEL Image[3 * BOUNDS_RIGHT * BOUNDS_BOTTOM];
 int ImageWidth;
 int ImageHeight;
@@ -99,7 +100,7 @@ int ReadPGM(char *image_name)
 	ImageHeight = height;
 	/* DEBUG */
 //	WriteALL(width, height, Image, "Images\\carl5.PGM", 5);  // gray image
-	WriteALL(width, height, Image, "Images\\carl5.PPM", 6);  // color image
+	WriteALL(width, height, Image, "Images\\Cone.PPM", 6);  // color image
 	//	WritePGM( width, height, &Image[0], "Karla5.PGM", UNUSED, NULL);
 
 	return 0;   // success 

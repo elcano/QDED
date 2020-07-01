@@ -12,10 +12,23 @@
 #include <stdio.h>  /* for FILE, fopen, fputc */
 #include <ctype.h>  /* for clock_t */
 #include <time.h>
+#include "features.h"  /* for PIXEL */
 /* delay in seconds before starting robot in motion */
 #define DELAY         0.0
 
+extern PIXEL Hue[];
+extern PIXEL Saturation[];
+extern PIXEL Intensity[];
+extern PIXEL Image[];
+extern int ImageWidth;
+extern int ImageHeight;
+
 int qded(char* image_name);
+void RGB2Gray(PIXEL* RGBimage, PIXEL* Grayimage, int height, int width);
+void RGB2Saturation(PIXEL* RGBimage, PIXEL* Saturation, int height, int width);
+void RGB2Hue(PIXEL* RGBimage, PIXEL* Hueimage, int height, int width);
+void WriteALL(int Width, int Height, PIXEL* image, char* filename, int Magic);
+int ReadPGM(char* image_name);
 /*
 Get the estimated vehicle state.
 State is position (xw, yw), velocity, yaw, pitch, roll etc.
@@ -89,10 +102,15 @@ Send updated state over CAN bus.
 
 int ConeDetect(char* image_name)
 {
+	int width, height;
 	// getVehicleState();
 	// getCameraState();
 	// getConeLocation();
 	// getColorImage();
+	if (0 != ReadPGM(image_name))
+		return 1;
+	width = ImageWidth;  // get globals
+	height = ImageHeight;
 	/*
 	Convert RGB image to (Hue, Saturation, Intensity) image
 	Theta = acos( (R-(G+B)/2) / sqrt( (R-G)*(R-G) + (R-B)(G-B)));
@@ -102,6 +120,16 @@ int ConeDetect(char* image_name)
 	Work with either the H or I image
 	*/
 	// makeMonochrome();
+	RGB2Gray(Image, Intensity, height, width);
+	WriteALL(width, height, Intensity, "Images\\Gray_cone.pgm", 5);
+	WriteALL(width, height, Image, "Images\\RGB_cone.ppm", 6);
+
+	RGB2Saturation(Image, Saturation, height, width);
+	WriteALL(width, height, Saturation, "Images\\Sat_cone.pgm", 5);
+
+	RGB2Hue(Image, Hue, height, width);
+	WriteALL(width, height, Hue, "Images\\Hue_cone.pgm", 5);
+
 	/*
 	Find three Peaks of vertical and horizontal histogram.
 	Take their intersections as the location of an orange blob
@@ -117,6 +145,7 @@ int ConeDetect(char* image_name)
 	// Find best fit to expected image
 	// Kalman();
 	// putState();
+	return 0;
 }
 
 int LaneDetect(char* image_name)
@@ -130,6 +159,7 @@ int LaneDetect(char* image_name)
 	qded(image_name);
 	// Kalman();
 	// putState();
+	return 0;
 }
 
 void ObstacleDetect()
@@ -165,13 +195,14 @@ int main(int argc, char* argv[])
 	//printf("moving\n");
 
 	char* image_name;	
-	image_name = argc < 2 ? "Images\\Carla5.ppm" : argv[1];
+//	image_name = argc < 2 ? "Images\\Carla5.ppm" : argv[1];
+	image_name = "Images\\IMG_0445crop.ppm";
 
 	// Find Orange Cones
 	ConeDetect(image_name);
 
 	// Find Lane Edges
-	LaneDetect(image_name);
+//	LaneDetect(image_name);
 
 	// Find Obstacles
 	ObstacleDetect();  // TO DO

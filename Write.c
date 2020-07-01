@@ -60,6 +60,7 @@ void WriteKernel( int diam,  float *image, char *filename)
 {
 	FILE *fp;
 	PIXEL line[100];
+	errno_t error;
 	float *kernel;
 	int i, j;
 	float minimum, maximum, scale;
@@ -80,7 +81,12 @@ void WriteKernel( int diam,  float *image, char *filename)
 	maximum = -minimum > maximum ? -minimum : maximum;
 	scale =  maximum < EPSILON? 1 : 127 / maximum;
 	kernel = image;
-	fopen_s(&fp, filename, "w");
+	error = fopen_s(&fp, filename, "w");
+	if (error || fp == NULL)
+	{
+		printf("WriteKernel Error %i", error);
+		return;
+	}
 	fprintf_s(fp, "P5 %i %i 255 ", diam, diam);
  	for(i=0; i < diam; i++)
 	{
@@ -520,6 +526,7 @@ void DrawLine( int i, PIXEL *image, int rowLength)
 void TestLine()
 {
 	FILE *fp;
+	errno_t error;
 	int i, j;
 	PIXEL test[FILTER_DIAM * FILTER_DIAM];
 	char filename[25];
@@ -543,7 +550,12 @@ void TestLine()
 				test[i+FILTER_DIAM*j] = 128;
 		DrawLine( 0, test, FILTER_DIAM);
 		sprintf_s(filename, 25, "Debug\\Test%.0i.PGM", Location[0].degrees);
-		fopen_s(&fp, filename, "w");
+		error = fopen_s(&fp, filename, "w");
+		if (error || fp == NULL)
+		{
+			printf("TestLine Error %i", error);
+			return;
+		}
 		fprintf_s(fp, "P5 %i %i 255 ", FILTER_DIAM, FILTER_DIAM);
  		for(i=0; i < FILTER_DIAM; i++)
 		{
@@ -555,7 +567,7 @@ void TestLine()
 
 }
 /*---------------------------------------------------------------------------*/
-/* Write a PGM image for debugging */
+/* Write a PGM image for debugging 
 void WritePGM( int Width, int Height, PIXEL *image, char *filename, 
 			   int featureIndex, struct FILTER *pKern)
 {
@@ -597,20 +609,26 @@ void WritePGM( int Width, int Height, PIXEL *image, char *filename,
 		fwrite(image_line, sizeof(unsigned char), Width, fp);
 	}
 	fclose(fp);
-}
+}*/
 /*---------------------------------------------------------------------------*/
 /* Write a PGM or PPM image of the whole input plus found lines */
 void WriteALL( int Width, int Height, PIXEL *image, char *filename, int Magic)
 {
 	FILE *fp;
+	errno_t error;
 	int i;
 	int width_pixels;
 	int pixel_bytes;
 	if (Magic < 1 || Magic >6)
-		Magic = 5;
-	pixel_bytes = (Magic == '5') ? 1 : 3;
-	width_pixels = (Magic == 3 || Magic == 6) ? 3* Width : Width;
-	fopen_s(&fp, filename, "wb");
+		Magic = 5;  // Gray
+	pixel_bytes = (Magic == 5) ? 1 : 3;
+	width_pixels = (Magic == 5) ? Width : 3* Width;
+	error = fopen_s(&fp, filename, "wb");
+	if (error || fp == NULL)
+	{
+		printf("WriteALL Error %i", error);
+		return;
+	}
 	fprintf_s(fp, "P%i %i %i 255 ", Magic, Width, Height);
  	for(i=0; i < Height; i++)
 	{

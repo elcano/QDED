@@ -25,8 +25,10 @@
 */
 #define VERT_STEREO 1
 /* maximum size of image, pixels */
+// iPhone 2592
 #define BOUNDS_RIGHT  1600
-#define BOUNDS_BOTTOM 1022
+ // iPhone 1936
+#define BOUNDS_BOTTOM 880
 /* maximum number of locations */
 #define MAX_LOCS (BOUNDS_RIGHT*BOUNDS_BOTTOM/FILTER_DIAM)
 
