@@ -84,3 +84,59 @@ void RGB2Hue(PIXEL* RGBimage, PIXEL* Hueimage, int height, int width)
 		}
 	}
 }
+/* Filter the pixels of the hue image to match a particular hue.
+   Pixels are set to 255 if minY <= hue <= maxY
+   They are set to zero for hue < minN or hue > maxN
+   Since hues are circular, this gets complicated by limits that wrap around the circle.
+   Red is at 0 or 360 degrees which is represented as 0 or 256.
+   To find red, one could set minY = 350 degrees -> 248 
+   and maxY = 10 degrees -> 7
+
+*/
+void HueFilter(int minN, int minY, int maxY, int maxN,
+	PIXEL* Hueimage, int height, int width)
+{
+	int i, j, k;
+	int hue;
+	int minNo, minYes, maxNo, maxYes;
+	minNo = minN; minYes = minY;
+	maxYes = maxY; maxNo = maxN;
+	// We expect minNo <= minYes <= maxYes <= maxN0
+	// But hues are circular and range from 0 to 360, which is mapped to 0 to 255
+	// Find out if the break point messes up the assumed order
+	// if (minNo <= maxNo)  OK; do nothing
+	if (maxNo > maxYes)
+	{
+		maxNo += 255;
+	}
+	else if (minNo > minYes)
+	{
+		minNo -= 255;
+	}
+	else if (maxYes < minYes)
+	{
+		maxYes += 255;
+		maxNo += 255;
+	}
+	for (i = 0; i < height; i++)
+	{
+		k = i * BOUNDS_RIGHT;
+		for (j = 0; j < width; j++,k++)
+		{
+			hue = Hueimage[k];
+			if (hue <= minNo || hue >= maxNo)
+				Hueimage[k] = 0;
+			else if ((hue >= minYes && hue <= maxYes) ||
+				(hue < maxY && maxY != maxYes))
+				Hueimage[k] = 255;
+			else if (hue > minNo && hue < minYes)
+				Hueimage[k] = (hue - minNo) * 255. / (minYes - minNo);
+			else if	((hue-255 > minNo && hue-255 < minYes))
+				Hueimage[k] = (hue-255 - minNo) * 255. / (minYes - minNo);
+			else if (hue < maxNo && hue > maxYes) // between maxYes and maxNo
+				Hueimage[k] = (maxNo - hue) * (maxNo - maxYes) / 255.;
+			else  
+				Hueimage[k] = (maxNo - hue - 255) * (maxNo - maxYes) / 255.;
+		}
+	}	
+}

@@ -27,6 +27,8 @@ int qded(char* image_name);
 void RGB2Gray(PIXEL* RGBimage, PIXEL* Grayimage, int height, int width);
 void RGB2Saturation(PIXEL* RGBimage, PIXEL* Saturation, int height, int width);
 void RGB2Hue(PIXEL* RGBimage, PIXEL* Hueimage, int height, int width);
+void HueFilter(int minN,int minY, int maxY, int maxN,
+	PIXEL* Hueimage, int height, int width);
 void WriteALL(int Width, int Height, PIXEL* image, char* filename, int Magic);
 int ReadPGM(char* image_name);
 /*
@@ -123,12 +125,24 @@ int ConeDetect(char* image_name)
 	RGB2Gray(Image, Intensity, height, width);
 	WriteALL(width, height, Intensity, "Images\\Gray_cone.pgm", 5);
 	WriteALL(width, height, Image, "Images\\RGB_cone.ppm", 6);
-
+	/* July 24, 2020  Tyler Folsom
+	   Turns out hue is not all that great for finding orange.
+	   Some shades of brown have the same hue.
+	   It would be possible to use the CIE transform into two color
+	   dimensions and use that to filter orange pixels.
+	   https://www.image-engineering.de/library/technotes/958-how-to-convert-between-srgb-and-ciexyz
+	  https://www.researchgate.net/figure/Left-Approximate-color-regions-on-CIE-1931-x-y-chromaticity-diagram-Gage-et-al_fig4_280903173
+	  However, the computation is probably too intense and not much better than just using a region of RGB color space.
+	  A strong orange is R=255, G=102 or 103, B=0.
+	 The region around R = 240-255, G = 88 to 157, B = 0-50 can be considered orange.
+	*/
 	RGB2Saturation(Image, Saturation, height, width);
 	WriteALL(width, height, Saturation, "Images\\Sat_cone.pgm", 5);
 
 	RGB2Hue(Image, Hue, height, width);
-	WriteALL(width, height, Hue, "Images\\Hue_cone.pgm", 5);
+	// Find Orange
+	HueFilter(0, 6, 22, 28, Hue, height, width);
+	WriteALL(width, height, Hue, "Images\\Orange_cone.pgm", 5);
 
 	/*
 	Find three Peaks of vertical and horizontal histogram.
